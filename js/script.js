@@ -147,7 +147,36 @@ const resetGame = ()=> {
 
 //A small straight is when four of the dice have consecutive values in any order (Ex. 1234) resulting in a score of 30 points. 
 const checkForStraights = (arr) => {
-  
+  const sortedArr = [...arr].sort((a, b) => a - b);
+
+  // Check for large straight
+  const isLargeStraight = (sortedArr.join('') === '12345' || sortedArr.join('') === '23456');
+
+  // Check for small straight
+  const uniqueSortedArr = [...new Set(sortedArr)];
+  const smallStraightPatterns = [
+    [1, 2, 3, 4],
+    [2, 3, 4, 5],
+    [3, 4, 5, 6]
+  ];
+
+  let isSmallStraight = false;
+  for (const pattern of smallStraightPatterns) {
+    if (pattern.every(num => uniqueSortedArr.includes(num))) {
+      isSmallStraight = true;
+      break;
+    }
+  }
+
+  if (isLargeStraight) {
+    updateRadioOption(4, 40); // Update the fifth radio button with a score of 40
+    updateRadioOption(3, 30); // Also update the fourth radio button with a score of 30
+  } else if (isSmallStraight) {
+    updateRadioOption(3, 30); // Update the fourth radio button with a score of 30
+    updateRadioOption(5, 0);  // Ensure the last radio button is reset to 0
+  } else {
+    updateRadioOption(5, 0);  // No straight, so set the last radio button to 0
+  }
 };
 
 // to make sure the dice is rolled only 3 times
@@ -161,6 +190,7 @@ rollDiceBtn.addEventListener("click", () => {
     resetRadioOptions();
     getHighestDuplicates(diceValuesArr);
     detectFullHouse(diceValuesArr);
+    checkForStraights(diceValuesArr);
   }
 });
 // toggle to show the rules
